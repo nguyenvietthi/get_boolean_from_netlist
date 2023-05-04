@@ -1,0 +1,1 @@
+# get_boolean_from_netlist
