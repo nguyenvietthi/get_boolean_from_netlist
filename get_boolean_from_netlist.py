@@ -1,6 +1,6 @@
-from anytree import Node, RenderTree
+from anytree import Node, RenderTree, PreOrderIter
 import re
-filename = r"./text/addr_conv_l2p_252_netlist.v"
+filename = r"./text/addr_conv_l2p_440_netlist.v"
  
 cell_regex = r"xor|\bor|and|inv"
 
@@ -77,7 +77,6 @@ def get_end_list_to_gen_tree():
 def get_tree(pre_node, output_pre):
     info_cell = get_list_input_ouput_of_subcell(output_pre)
     current_node = Node(info_cell[-1], parent=pre_node)
-    # print(info_cell)
     for output_curr in info_cell[0]:
         # print(output_curr)
         # print(output_curr in input_list)
@@ -88,41 +87,36 @@ def get_tree(pre_node, output_pre):
 
 end_tree_list  = get_end_list_to_gen_tree()
 
+def get_boolean_from_tree(root_node):
+    root_node = Node(output)
+    get_tree(root_node, output)
+    node_path_list = []
+    max_path = 0
+    print([node.name for node in PreOrderIter(root_node)])
+
+    for pre, fill, node in RenderTree(root_node):
+        # print([str(node.name) for node in node.path])
+        print("%s%s" % (pre, node.name))
+        
+    # for pre, fill, node in RenderTree(root_node):
+    #     list_node = [str(node.name) for node in node.path]
+    #     if(len(list_node) > max_path):
+    #         max_path = len(list_node)
+    #     node_path_list.append(list_node)
+    # print(max_path)
+    # for number, path in enumerate(node_path_list):
+    #     try:
+    #         print(path[max_path - 1])
+    #     except IndexError:
+    #         pass
+
+
+
+
+
 
 output_list = get_list_port("output")
 print(output_list)
 
-for ouput in output_list:
-    raw_node = Node(ouput)
-    get_tree(raw_node, ouput)
-  
-    for pre, fill, node in RenderTree(raw_node):
-        print("%s%s" % (pre, node.name))
-
-
-# get_tree_from_output("paddr[0]")
-# for output in output_dict:
-#     for i in range(output_dict[output]):
-#         out_string = output + "[" + str(i) + "]"
-#         output_node = Node(out_string)
-
-#         print(get_line_include_string(out_string))
-
-
-# udo = Node("Udo")
-# marc = Node("Marc", parent=udo)
-# lian = Node("Lian", parent=marc)
-# dan = Node("Dan", parent=udo)
-# jet = Node("Jet", parent=dan)
-# jan = Node("Jan", parent=dan)
-# joe = Node("Joe", parent=dan)
-
-# print(udo)
-
-# print(joe)
-
-# for pre, fill, node in RenderTree(udo):
-#     print("%s%s" % (pre, node.name))
-
-
-# print(udo.children)
+for output in output_list:
+    get_boolean_from_tree(output)
