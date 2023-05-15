@@ -1,9 +1,7 @@
 from anytree import Node, RenderTree, PreOrderIter, LevelOrderGroupIter
 import re
 filename = r"./text/addr_conv_l2p_440_netlist.v"
- 
 cell_regex = r"xor|_or|and|inv"
-
 def get_line_include_string(sub_string):
     list_line = []
     with open(filename) as file:
@@ -27,11 +25,7 @@ def get_list_port(direction):
     port_list = get_line_include_string(direction)
     string_list = []
     for port_string in port_list:
-        port = port_string.replace(direction, "")
-        port = port.replace("]", "")
-        port = port.replace("[", "")
-        port = port.replace(":0", "")
-        port = port.replace(";", "")
+        port = port_string.replace(direction, "").replace("]", "").replace("[", "").replace(":0", "").replace(";", "")
         port_split = port.split(" ")
         for i in range(int(port_split[2]) + 1):
             string_list.append(port_split[-1] + "[" + str(i) + "]")
@@ -61,75 +55,60 @@ def get_end_list_to_gen_tree():
         lines = get_line_include_string(input)
         if(len(lines) and re.sub(' +', ' ', lines[-1]).split(" ")[1] == "assign"):
             input_list[number] = re.sub(' +', ' ', lines[-1]).split(" ")[2]
-
     return input_list
 
-def get_tree(pre_node, output_pre):
+def get_tree(pre_node, output_pre, end_tree_list, input_list):
     info_cell = get_list_input_ouput_of_subcell(output_pre)
     current_node = Node(info_cell[-1], parent=pre_node)
     for output_curr in info_cell[0]:
-        # print(output_curr)
-        # print(output_curr in input_list)
         if(output_curr in end_tree_list):
-            Node(output_curr, parent=current_node)
+            Node(input_list[end_tree_list.index(output_curr)], parent=current_node)
         else:
-            get_tree(current_node, output_curr)
-
-end_tree_list  = get_end_list_to_gen_tree()
+            get_tree(current_node, output_curr, end_tree_list, input_list)
 
 def get_boolean_from_tree(output):
     boolean = ""
     root_node = Node(output)
-    get_tree(root_node, output)
-
+    end_tree_list  = get_end_list_to_gen_tree()
+    input_list = get_list_port("input")
+    get_tree(root_node, output, end_tree_list, input_list)
     print([node.name for node in PreOrderIter(root_node)])
     for pre, fill, node in RenderTree(root_node):
-        # print([str(node.name) for node in node.path])
         print("%s%s" % (pre, node.name))
     level_node_list = [[node for node in children] for children in LevelOrderGroupIter(root_node)]
     level_node_list.reverse()
-    # print(level_node_list)
     parent_node = {}
     for node_list in level_node_list:
-        for number, node in enumerate(node_list):
-            print(node.name)
+        for node in node_list:
+            # print(node.name)
             if node in parent_node:
-
                 if node.parent in parent_node:
-                    # print("a")
-                    # if(number != len(node_list) - 1):
-                    #     print("b")
                     if(parent_node[node.parent][-1] != ")"):
                         parent_node[node.parent] = parent_node[node.parent] + " " + node.parent.name[1] + " " + parent_node[node] + ")"
                     else:
                         parent_node[node.parent] = parent_node[node.parent][:-1] + " " + node.parent.name[1] + " " + parent_node[node] + ")"
-                      
-
                 else:
-                    # print(node.parent.name)
-                    print("b")
                     try:
                         if(node.parent.name[1] == "inv"):
-                            parent_node[node.parent] =  "(inv" + parent_node[node] + ")))"
+                            parent_node[node.parent] =  "(inv" + parent_node[node] + ")"
                         else:
-                            parent_node[node.parent] =  "(" + parent_node[node]
+                            if(node.name[1] != "inv"):
+                                parent_node[node.parent] =  "(" + parent_node[node] + ")"
+                            else:
+                                parent_node[node.parent] =  "(inv" + parent_node[node] + ")"
                     except AttributeError:
                         boolean = node.name + " = " + parent_node[node]
                 parent_node.pop(node)
             else:
                 if node.parent in parent_node:
-                    print("c")
                     if(parent_node[node.parent][-1] != ")"):
                         parent_node[node.parent] = parent_node[node.parent] + " " + node.parent.name[1] + " " + node.name + ")"
                     else:
                         parent_node[node.parent] = parent_node[node.parent][:-1] + " " + node.parent.name[1] + " " + node.name + ")"
                 else:
-                    print("d")
-                    parent_node[node.parent] = "(" + node.name
-        print(parent_node)
-        print(boolean)
-
+                    parent_node[node.parent] = "(" + node.name + ")"
+    print(boolean.replace("xor", "^").replace("and", "&").replace("_or", "|").replace("inv", "~"))
 
 output_list = get_list_port("output")
 for output in output_list:
-    get_boolean_from_tree(output_list[7])
+    get_boolean_from_tree(output)
