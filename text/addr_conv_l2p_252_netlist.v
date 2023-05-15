@@ -52,3 +52,4 @@ module addr_conv_l2p ( laddr, paddr );
   dti_55g_10t_and2x8 U68 ( .A(laddr[8]), .B(n48), .Z(paddr[8]) );
 endmodule
 
+paddr[7] = (((((laddr[6] and laddr_adj_1[5] and (laddr_adj_1[3] and laddr_adj_1[4]) _or (laddr[7] _or laddr[8]) and (laddr[8] xor ((inv(laddr[7] xor (laddr[6] and laddr_adj_1[5] and (laddr_adj_1[3] and laddr_adj_1[4]))))) and (laddr[6] _or (laddr_adj_1[3] and laddr_adj_1[4] and laddr_adj_1[5])))) _or (laddr[6] and (inv(laddr[7] _or laddr[8])))) and (inv(laddr_adj_1[3] and laddr_adj_1[4] and laddr_adj_1[5]))))))
