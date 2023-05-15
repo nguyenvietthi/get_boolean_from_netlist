@@ -72,9 +72,10 @@ def get_boolean_from_tree(output):
     end_tree_list  = get_end_list_to_gen_tree()
     input_list = get_list_port("input")
     get_tree(root_node, output, end_tree_list, input_list)
-    print([node.name for node in PreOrderIter(root_node)])
-    for pre, fill, node in RenderTree(root_node):
-        print("%s%s" % (pre, node.name))
+    # print([node.name for node in PreOrderIter(root_node)])
+    print()
+    # for pre, fill, node in RenderTree(root_node):
+    #     print("%s%s" % (pre, node.name))
     level_node_list = [[node for node in children] for children in LevelOrderGroupIter(root_node)]
     level_node_list.reverse()
     parent_node = {}
@@ -95,9 +96,9 @@ def get_boolean_from_tree(output):
                             if(node.name[1] != "inv"):
                                 parent_node[node.parent] =  "(" + parent_node[node] + ")"
                             else:
-                                parent_node[node.parent] =  "(inv" + parent_node[node] + ")"
+                                parent_node[node.parent] =  "((inv" + parent_node[node] + "))"
                     except AttributeError:
-                        boolean = node.name + " = " + parent_node[node]
+                        boolean = node.name + " = " + parent_node[node][2:-2]
                 parent_node.pop(node)
             else:
                 if node.parent in parent_node:
