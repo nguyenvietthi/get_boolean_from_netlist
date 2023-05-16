@@ -66,7 +66,7 @@ def get_tree(pre_node, output_pre, end_tree_list, input_list):
         else:
             get_tree(current_node, output_curr, end_tree_list, input_list)
 
-def get_boolean_from_tree(output):
+def get_boolean(output):
     boolean = ""
     root_node = Node(output)
     end_tree_list  = get_end_list_to_gen_tree()
@@ -110,4 +110,4 @@ def get_boolean_from_tree(output):
 
 output_list = get_list_port("output")
 for output in output_list:
-    get_boolean_from_tree(output)
+    get_boolean(output)
