@@ -1,0 +1,7 @@
+vlib work
+
+vlog -sv /data5/workspace/thinv0/dti_emmc/branches/dti_emmc_65lp_rev0p0p1/dti_emmc_host/lib/std/dti_tm65lp_60g_10t_stdcells_rev6p0p0.v -sv ../../addr_conv_l2p_440_netlist.v -sv ../../test.sv
+
+vsim -c test -wlf vsim.wlf  -voptargs=+acc -do "add wave -r /test/*; run -all; quit"
+
+echo "440"
