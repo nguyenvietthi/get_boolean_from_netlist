@@ -1,6 +1,6 @@
 from anytree import Node, RenderTree, PreOrderIter, LevelOrderGroupIter
 import re
-filename = r"./text/addr_conv_l2p_440_netlist.v"
+filename = r"./text/addr_conv_l2p_252_netlist.v"
 cell_regex = r"xor|_or|and|inv"
 def get_line_include_string(sub_string):
     list_line = []
@@ -72,16 +72,14 @@ def get_boolean_from_tree(output):
     end_tree_list  = get_end_list_to_gen_tree()
     input_list = get_list_port("input")
     get_tree(root_node, output, end_tree_list, input_list)
-    # print([node.name for node in PreOrderIter(root_node)])
     print()
-    # for pre, fill, node in RenderTree(root_node):
-    #     print("%s%s" % (pre, node.name))
+    for pre, fill, node in RenderTree(root_node):
+        print("%s%s" % (pre, node.name))
     level_node_list = [[node for node in children] for children in LevelOrderGroupIter(root_node)]
     level_node_list.reverse()
     parent_node = {}
     for node_list in level_node_list:
         for node in node_list:
-            # print(node.name)
             if node in parent_node:
                 if node.parent in parent_node:
                     if(parent_node[node.parent][-1] != ")"):
@@ -93,10 +91,7 @@ def get_boolean_from_tree(output):
                         if(node.parent.name[1] == "inv"):
                             parent_node[node.parent] =  "(inv" + parent_node[node] + ")"
                         else:
-                            if(node.name[1] != "inv"):
-                                parent_node[node.parent] =  "(" + parent_node[node] + ")"
-                            else:
-                                parent_node[node.parent] =  "((inv" + parent_node[node] + "))"
+                            parent_node[node.parent] =  "(" + parent_node[node] + ")"
                     except AttributeError:
                         boolean = node.name + " = " + parent_node[node][2:-2]
                 parent_node.pop(node)
@@ -106,8 +101,11 @@ def get_boolean_from_tree(output):
                         parent_node[node.parent] = parent_node[node.parent] + " " + node.parent.name[1] + " " + node.name + ")"
                     else:
                         parent_node[node.parent] = parent_node[node.parent][:-1] + " " + node.parent.name[1] + " " + node.name + ")"
-                else:
-                    parent_node[node.parent] = "(" + node.name + ")"
+                else:                   
+                    if(node.parent.name[-1] == "inv"):
+                        parent_node[node.parent] = "(inv" + node.name + ")"
+                    else:
+                        parent_node[node.parent] = "(" + node.name + ")"
     print(boolean.replace("xor", "^").replace("and", "&").replace("_or", "|").replace("inv", "~"))
 
 output_list = get_list_port("output")
